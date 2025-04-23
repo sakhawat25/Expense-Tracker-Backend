@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,5 +18,7 @@ Route::prefix('v1')->group(function() {
         });
 
         Route::post('logout', [AuthenticationController::class, 'logout'])->name('logout');
+
+        Route::apiResource('expenses', ExpenseController::class);
     });
 });
