@@ -22,7 +22,7 @@ Route::get('/auth/verify-email/{id}/{hash}', function ($id, $hash, Request $requ
     // Generate token for auto-login
     $token = $user->createToken('auth_token')->plainTextToken;
 
-    return redirect(env('FRONTEND_URL') . '/verify-email?status=success&token=' . $token);
+    return redirect(env('FRONTEND_URL', 'http://localhost:5173') . '/verify-email?status=success&token=' . $token);
 })->middleware('signed')->name('verification.verify');
 
 

@@ -26,7 +26,7 @@ abstract class Controller
     public function verifyHcaptcha($token)
     {
         $response = Http::asForm()->post('https://hcaptcha.com/siteverify', [
-            'secret'   => env('HCAPTCHA_SECRET'),
+            'secret'   => env('HCAPTCHA_SECRET', 'ES_f22e90507d0f4b17aa80c8146922997a'),
             'response' => $token,
         ]);
 
