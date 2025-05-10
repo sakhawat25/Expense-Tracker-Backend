@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class AuthenticationController extends Controller
 {
@@ -55,34 +56,15 @@ class AuthenticationController extends Controller
         return $this->successResponse(['token' => $token], 'Login successful!');
     }
 
-    public function register(Request $request)
+    public function register(Request $request, CreatesNewUsers $creator)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-            'hcaptcha_token' => 'required',
-        ], [
-            'hcaptcha_token.required' => 'Captcha is required',
-        ]);
+        // Validate and create user
+        event(new Registered($user = $creator->create($request->all())));
 
-        if (! $this->verifyHcaptcha($request->hcaptcha_token)) {
-            return response()->json([
-                'errors' => [
-                    'hcaptcha_token' => ['Captcha verification failed. Please try again.']
-                ]
-            ], 422);
-        }
-
-        $validatedData['password'] = Hash::make($request->password);
-
-        $user = User::create($validatedData);
-
-        event(new Registered($user));
-
-        return $this->successResponse(
-            message: 'Registration successful, please check your email for verification'
-        );
+        // Laravel will automatically send email verification if needed
+        return response()->json([
+            'message' => 'Registered successfully. Please check your email to verify your account.',
+        ], 201);
     }
 
     public function logout(Request $request) {

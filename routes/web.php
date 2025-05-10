@@ -1,8 +1,11 @@
 <?php
 
-use App\Models\User;
+use App\Http\Controllers\Auth\AuthenticationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/register', [AuthenticationController::class, 'register'])->middleware('guest');
+
 
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $user = \App\Models\User::find($id);
