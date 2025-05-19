@@ -81,7 +81,41 @@ class ExpenseController extends Controller
      */
     public function update(UpdateExpenseRequest $request, Expense $expense)
     {
-        //
+        // Find or add category if provided in request
+        $category = null;
+
+        if ($request->category) {
+            $category = Category::firstOrCreate([
+                'name' => $request->category,
+                'user_id' => $request->user()->id,
+            ]);
+        }
+
+        if ($category) {
+            // Update expense with category
+            $expense->update([
+                'category_id' => $category->id,
+                'amount' => $request->amount,
+                'date' => $request->date,
+                'note' => $request->note,
+            ]);
+        }
+
+        else {
+            // Update expense without category
+            $expense->update([
+                'amount' => $request->amount,
+                'date' => $request->date,
+                'note' => $request->note,
+            ]);
+        }
+
+        // return successful response
+        $expenses = $this->getExpenseRecords();
+
+        return $this->successResponse([
+            'expenses' => $expenses
+        ], 'Record updated successfully.');
     }
 
     /**
@@ -89,7 +123,14 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
-        //
+        $expense->delete();
+
+        // return successful response
+        $expenses = $this->getExpenseRecords();
+
+        return $this->successResponse([
+            'expenses' => $expenses
+        ], 'Record deleted successfully.');
     }
 
     private function getExpenseRecords() 
