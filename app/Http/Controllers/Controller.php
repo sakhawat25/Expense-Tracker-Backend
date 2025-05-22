@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Http;
 
 abstract class Controller
 {
@@ -21,15 +20,5 @@ abstract class Controller
             'data' => $data,
             'message' => $message,
         ], $status_code);
-    }
-
-    public function verifyHcaptcha($token)
-    {
-        $response = Http::asForm()->post('https://hcaptcha.com/siteverify', [
-            'secret'   => env('HCAPTCHA_SECRET', 'ES_f22e90507d0f4b17aa80c8146922997a'),
-            'response' => $token,
-        ]);
-
-        return $response->json('success');
     }
 }

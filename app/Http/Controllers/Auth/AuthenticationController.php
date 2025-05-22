@@ -17,32 +17,23 @@ class AuthenticationController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
-            'hcaptcha_token' => 'required',
         ], [
             'email.required' => 'Email is required',
             'email.email' => 'Invalid email address',
             'password.required' => 'Password is required',
-            'hcaptcha_token.required' => 'Captcha is required',
         ]);
 
-        if (! $this->verifyHcaptcha($request->hcaptcha_token)) {
-            return response()->json([
-                'errors' => [
-                    'hcaptcha_token' => ['Captcha verification failed. Please try again.']
-                ]
-            ], 422);
-        }
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         // Check if email is verified
-        if (! $user->hasVerifiedEmail()) {
+        if (!$user->hasVerifiedEmail()) {
             event(new Registered($user));
 
             return $this->errorResponse([
