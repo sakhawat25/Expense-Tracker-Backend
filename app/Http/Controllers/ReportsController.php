@@ -39,7 +39,7 @@ class ReportsController extends Controller
         $wholeYearExpenses = $user->expenses()
             ->with('category:id,name')
             ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->latest()
+            ->orderBy('date', 'DESC')
             ->get();
 
         return $this->successResponse([
@@ -53,8 +53,8 @@ class ReportsController extends Controller
     public function filter(Request $request)
     {
         $request->validate([
-            'from' => 'required|date|date_format:Y-m-d',
-            'to' => 'required|date|date_format:Y-m-d',
+            'from' => 'required|date|date_format:Y-m-d|before_or_equal:to',
+            'to' => 'required|date|date_format:Y-m-d|after_or_equal:from',
         ]);
 
         $user = $request->user();
@@ -94,7 +94,7 @@ class ReportsController extends Controller
         $expensesListInRange = $user->expenses()
             ->with('category:id,name')
             ->whereBetween('date', [$startDate, $endDate])
-            ->latest()
+            ->orderBy('date', 'DESC')
             ->get();
 
         return $this->successResponse([
