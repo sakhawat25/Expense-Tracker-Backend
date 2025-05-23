@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $expensesPerCategory = $user->categories()->withSum('expenses', 'amount')->get();
 
         // Recent expenses
-        $recentExpenses = $user->expenses()->with('category:user_id,name')->latest()->limit(5)->get();
+        $recentExpenses = $user->expenses()->with('category:id,name')->latest()->limit(5)->get();
 
         return $this->successResponse([
             'totalExpenses' => $totalExpenses,
